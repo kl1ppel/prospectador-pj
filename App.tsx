@@ -4,8 +4,9 @@ import { PhoneNumberInput } from './components/PhoneNumberInput';
 import { MessageComposer } from './components/MessageComposer';
 import { MessageList } from './components/MessageList';
 import { LoadingIcon } from './components/icons';
-import { Footer } from './components/Footer';
 
+import { useEffect } from 'react';
+import './index.css'; // ou o caminho correto para o seu arquivo CSS
 const App: React.FC = () => {
   const [phoneNumbers, setPhoneNumbers] = useState<string[]>([]);
   const [baseMessage, setBaseMessage] = useState<string>('');
@@ -13,6 +14,23 @@ const App: React.FC = () => {
   const [error, setError] = useState<string | null>(null); 
   const [fileError, setFileError] = useState<string | null>(null);
   const [fileSuccess, setFileSuccess] = useState<string | null>(null);
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      return savedTheme === 'dark';
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    const theme = isDarkMode ? 'dark' : 'light';
+    document.documentElement.classList.toggle('dark', isDarkMode);
+    localStorage.setItem('theme', theme);
+  }, [isDarkMode]);
+
+  const toggleTheme = () => {
+    setIsDarkMode(prev => !prev);
+  };
 
   const formatPhoneNumberForStorage = (numberStr: string): string => {
     let phoneOnly = numberStr.split(',')[0].trim();
@@ -156,38 +174,56 @@ const App: React.FC = () => {
   const showSendSection = phoneNumbers.length > 0 && baseMessage.trim() !== '';
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="flex flex-col min-h-screen bg-background">
       <main className="flex-grow">
-        <div className="container mx-auto px-4 py-8 max-w-4xl">
+        <div className="container mx-auto px-4 py-8 max-w-4xl flex-grow">
+          <div className="flex justify-end mb-4">
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              aria-label="Toggle dark mode"
+            >
+              {isDarkMode ? (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                </svg>
+              ) : (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707" />
+                </svg>
+              )}
+            </button>
+          </div>
           <header className="mb-10 text-center flex flex-col items-center">
-            <img src="https://logodix.com/logo/544373.png" alt="App Logo" className="h-20 w-20 mb-4"/>
-            <h1 className="text-4xl font-bold text-basetone sm:text-5xl">PROSPECTADOR PJ</h1>
-            <p className="mt-3 text-lg text-gray-600">Automatiza o processo de prospecção de empresas utilizando planilhas, e disparando para o whatsapp.</p>
-          </header>
+              <img src="https://logodix.com/logo/544373.png" alt="App Logo" className="h-20 w-20 mb-4"/>
+              <h1 className="text-4xl font-bold text-basetone sm:text-5xl section-header">PROSPECTADOR PJ</h1>
+              <p className="mt-3 text-lg text-gray-600">Automatiza o processo de prospecção de empresas utilizando planilhas, e disparando para o whatsapp.</p>
+            </header>
 
           <div className="space-y-8">
-            <section className="bg-white border border-gray-200 rounded-lg p-6">
-              <h2 className="text-2xl font-semibold text-basetone mb-4">1. Adicionar Números</h2>
+            <section className="card border border-gray-200 rounded-lg p-6">
+              <h2 className="text-2xl font-semibold text-basetone mb-4 section-header">ADICIONAR NÚMEROS</h2>
               <div className="space-y-4">
                 <div>
-                  <h3 className="text-lg font-medium text-gray-700 mb-2">A. Adicionar Manualmente</h3>
+                  <h3 className="text-lg font-medium text-gray-700 mb-2">1 = Manual</h3>
                   <PhoneNumberInput onAddPhoneNumber={handleAddPhoneNumber} />
                 </div>
                 <div>
-                  <h3 className="text-lg font-medium text-gray-700 mb-2">B. Importar da Planilha</h3>
+                  <h3 className="text-lg font-medium text-gray-700 mb-2">2 = Importar</h3>
                   <div className="flex flex-col gap-4">
                     <div className="flex flex-col gap-2">
-                      <label className="text-sm font-medium text-gray-700">Selecione o arquivo Excel</label>
+                      <label className="text-sm font-medium text-gray-700">(txt, clsx, csv)</label>
                       <input
                         type="file"
-                        accept=".xlsx,.xls,.csv"
+                        accept=".csv,.xlsx,.xls,.txt"
                         onChange={handleFileUpload}
                         className="block w-full text-sm text-gray-500
                                   file:mr-4 file:py-2 file:px-4
                                   file:rounded-full file:border-0
                                   file:text-sm file:font-semibold
                                   file:bg-primary file:text-white
-                                  hover:file:bg-primary/90"
+                                  hover:file:bg-primary/90
+                                  file:text-[Procurar]"
                       />
                     </div>
                     {error && <p className="text-red-500 text-sm">{error}</p>}
@@ -214,8 +250,8 @@ const App: React.FC = () => {
               </div>
             </section>
 
-            <section className="bg-white border border-gray-200 rounded-lg p-6">
-              <h2 className="text-2xl font-semibold text-basetone mb-4">2. Compor Mensagem Base</h2>
+            <section className="card border border-gray-200 rounded-lg p-6">
+              <h2 className="text-2xl font-semibold text-basetone mb-4 section-header">MENSAGEM PADRAO</h2>
               <MessageComposer baseMessage={baseMessage} setBaseMessage={setBaseMessage} />
               {phoneNumbers.length > 0 && !baseMessage.trim() && (
                 <p className="mt-2 text-sm text-yellow-700">Adicione uma mensagem base para prosseguir para o envio.</p>
@@ -241,14 +277,15 @@ const App: React.FC = () => {
       </main>
       
       <footer className="bg-neutral text-center">
+          <div className="w-full max-w-4xl mx-auto h-32 overflow-hidden rounded-lg shadow-md mb-4">
+            <img src="https://scontent.fpoa48-1.fna.fbcdn.net/v/t39.30808-6/268058506_10158189729895588_5061131285468110337_n.png?_nc_cat=109&ccb=1-7&_nc_sid=cc71e4&_nc_ohc=p9CpuMFA8l4Q7kNvwHj4jG4&_nc_oc=AdnyVq1UocyqbV5BzbFSsE0lQ2rrg3KhKBuAE_vnCenP_6aK2W5wxE-rXteTEX8_QFY&_nc_zt=23&_nc_ht=scontent.fpoa48-1.fna&_nc_gid=OIy0wfHdxNBJms0hCy1jnw&oh=00_AfIsHMHYyXBRoFK5Ljgbzih9obCndtZcWcMknoqZxzsCfQ&oe=683C373F" alt="Banner de Rodapé" className="w-full h-full object-cover object-center" />
+        </div>
         <div className="max-w-3xl mx-auto pt-8 pb-4 px-4 sm:px-6 lg:px-8">
           <p className="text-sm text-gray-500">Made by Gabriel Klippel</p>
-        </div>
-        <div className="w-full max-w-3xl mx-auto h-20 overflow-hidden rounded-lg shadow-md mb-4">
-          <img src="https://via.placeholder.com/800x160/333333/FFFFFF?text=PLAN+ADAPT+OVERCOME" alt="Banner de Rodapé" className="w-full h-full object-cover object-center" />
+          <p className="text-sm text-gray-500 mt-2">T827505</p>
         </div>
       </footer>
-      <Footer />
+
     </div>
   );
 };

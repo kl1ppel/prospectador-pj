@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: 17 24 39; /* gray-900 (acts as black) */
+  --color-secondary: 75 85 99; /* gray-500 */
+  --color-accent: 209 213 219; /* gray-300 */
+  --color-neutral: 255 255 255; /* white */
+  --color-basetone: 17 24 39; /* gray-900 (main text color) */
+  --color-whatsapp: 37 211 102; /* WhatsApp Green */
+}
+
+body {
+  background-color: rgb(var(--color-neutral));
+  color: rgb(var(--color-basetone));
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.dark {
+  --color-neutral: 17 24 39;
+  --color-basetone: 255 255 255;
+  --color-secondary: 156 163 175;
+  --color-accent: 107 114 128;
+}
+
+.dark .bg-neutral {
+  background-color: rgb(17, 24, 39);
+}
+
+.dark .text-basetone {
+  color: rgb(255, 255, 255);
+}
+
+.dark .section-header {
+  color: rgb(209, 213, 219);
+}
+
+.dark .input-field {
+  background-color: rgb(110, 118, 128);
+  border-color: rgb(75, 85, 99);
+  color: rgb(209, 213, 219);
+}
+
+.dark .button-primary {
+  background-color: rgb(110, 118, 128);
+  color: rgb(209, 213, 219);
+}
+
+.dark .button-primary:hover {
+  background-color: rgb(75, 85, 99);
+}

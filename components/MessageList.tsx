@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { WhatsAppIcon } from './icons'; 
 
@@ -15,24 +14,18 @@ const MessageCard: React.FC<{ phoneNumber: string; baseMessage: string }> = ({ p
       return;
     }
 
-    // phoneNumber prop is already formatted by App.tsx (e.g. +5511..., or 12345 if not auto-prefixed)
     let finalNumberForLink = phoneNumber.replace(/\D/g, ''); // Remove all non-digits
 
-    // If the original formatted number from App.tsx started with '+', ensure the link number also does.
-    // This handles cases where App.tsx stored "+5511..." and replace(/\D/g, '') made it "5511...".
     if (phoneNumber.startsWith('+') && !finalNumberForLink.startsWith('+')) {
         finalNumberForLink = `+${finalNumberForLink}`;
     }
-    // If phoneNumber from App.tsx did not start with '+', finalNumberForLink will be digits only.
-    // e.g. if App.tsx stored "12345", finalNumberForLink is "12345". wa.me/12345
-    // e.g. if App.tsx stored "+55119...", phoneNumber is "+55119...", finalNumberForLink becomes "+55119..."
 
     const whatsappUrl = `https://wa.me/${finalNumberForLink}?text=${encodeURIComponent(baseMessage)}`;
     window.open(whatsappUrl, '_blank');
   };
 
   return (
-    <div className="bg-white border border-gray-200 p-4 rounded-lg flex flex-col sm:flex-row justify-between items-center gap-3">
+    <div className="bg-white border border-gray-300 p-4 rounded-lg shadow-md flex flex-col sm:flex-row justify-between items-center gap-3 transition-transform transform hover:scale-105">
       <p className="text-md font-semibold text-basetone break-all flex-grow">{phoneNumber}</p>
       <button
         onClick={handleSendViaWhatsApp}
@@ -45,7 +38,6 @@ const MessageCard: React.FC<{ phoneNumber: string; baseMessage: string }> = ({ p
     </div>
   );
 };
-
 
 export const MessageList: React.FC<MessageListProps> = ({ phoneNumbers, baseMessage }) => {
   if (phoneNumbers.length === 0) {

@@ -4,31 +4,33 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PROSPECTADOR PJ</title>
+  <link rel="icon" type="image/png" href="https://logodix.com/logo/544373.png" />
+  <link rel="stylesheet" href="/src/index.css">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
           colors: {
-            primary: 'rgb(var(--color-primary) / <alpha-value>)', // Black or dark gray
-            secondary: 'rgb(var(--color-secondary) / <alpha-value>)', // Medium gray
-            accent: 'rgb(var(--color-accent) / <alpha-value>)', // Light gray for borders/accents
-            neutral: 'rgb(var(--color-neutral) / <alpha-value>)', // White or off-white
-            basetone: 'rgb(var(--color-basetone) / <alpha-value>)', // Black or very dark gray for text
-            whatsapp: '#25D366', // WhatsApp Green
+            primary: '#1a1a1a',
+            secondary: '#666666',
+            accent: '#cccccc',
+            neutral: '#ffffff',
+            basetone: '#000000',
+            whatsapp: '#25D366',
           }
         }
       }
     }
   </script>
-  <style type="text/tailwindcss">
-    @layer base {
-      :root {
-        --color-primary: 17 24 39; /* gray-900 (acts as black) */
-        --color-secondary: 75 85 99; /* gray-500 */
-        --color-accent: 209 213 219; /* gray-300 */
-        --color-neutral: 255 255 255; /* white */
-        --color-basetone: 17 24 39; /* gray-900 (main text color) */
+  <script type="importmap">
+  {
+    "imports": {
+      "react-dom/": "https://esm.sh/react-dom@^19.1.0/",
+      "react": "https://esm.sh/react@^19.1.0",
+      "react/": "https://esm.sh/react@^19.1.0/",
+      "@google/genai": "https://esm.sh/@google/genai@^1.1.0",
+      "read-excel-file": "https://esm.sh/read-excel-file@^5.8.1"
       }
       body {
         @apply bg-neutral text-basetone font-sans;
