@@ -4,6 +4,7 @@ import { PhoneNumberInput } from './components/PhoneNumberInput';
 import { MessageComposer } from './components/MessageComposer';
 import { MessageList } from './components/MessageList';
 import { LoadingIcon } from './components/icons';
+import { Footer } from './components/Footer';
 
 const App: React.FC = () => {
   const [phoneNumbers, setPhoneNumbers] = useState<string[]>([]);
@@ -155,9 +156,9 @@ const App: React.FC = () => {
   const showSendSection = phoneNumbers.length > 0 && baseMessage.trim() !== '';
 
   return (
-    <div className="min-h-screen bg-neutral flex flex-col">
-      <main className="flex-grow py-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-3xl mx-auto">
+    <div className="min-h-screen bg-background">
+      <main className="flex-grow">
+        <div className="container mx-auto px-4 py-8 max-w-4xl">
           <header className="mb-10 text-center flex flex-col items-center">
             <img src="https://logodix.com/logo/544373.png" alt="App Logo" className="h-20 w-20 mb-4"/>
             <h1 className="text-4xl font-bold text-basetone sm:text-5xl">PROSPECTADOR PJ</h1>
@@ -173,43 +174,44 @@ const App: React.FC = () => {
                   <PhoneNumberInput onAddPhoneNumber={handleAddPhoneNumber} />
                 </div>
                 <div>
-                  <h3 className="text-lg font-medium text-gray-700 mb-2">B. Carregar de Arquivo</h3>
-                  <p className="text-xs text-gray-500 mb-2">Para Excel/CSV: CNPJs na coluna A, telefones na coluna T (primeiro telefone por CNPJ, antes da vírgula).</p>
-                  <p className="text-xs text-gray-500 mb-2">Para TXT: Um número de telefone por linha (primeiro antes da vírgula).</p>
-                  <p className="text-xs text-gray-500 mb-2">Formato esperado: XX-XXXXXXXX (será convertido para +55XXXXXXXXXX).</p>
-                  <input 
-                    type="file" 
-                    accept=".xlsx, .xls, .csv, .txt" 
-                    onChange={handleFileUpload} 
-                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-neutral hover:file:bg-secondary cursor-pointer" 
-                    disabled={isProcessingFile} 
-                  />
-                  {isProcessingFile && (
-                    <div className="mt-2 flex items-center text-sm text-gray-600">
-                      <LoadingIcon className="animate-spin h-4 w-4 mr-2 text-primary" />
-                      Processando arquivo...
+                  <h3 className="text-lg font-medium text-gray-700 mb-2">B. Importar da Planilha</h3>
+                  <div className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-2">
+                      <label className="text-sm font-medium text-gray-700">Selecione o arquivo Excel</label>
+                      <input
+                        type="file"
+                        accept=".xlsx,.xls,.csv"
+                        onChange={handleFileUpload}
+                        className="block w-full text-sm text-gray-500
+                                  file:mr-4 file:py-2 file:px-4
+                                  file:rounded-full file:border-0
+                                  file:text-sm file:font-semibold
+                                  file:bg-primary file:text-white
+                                  hover:file:bg-primary/90"
+                      />
                     </div>
-                  )}
-                  {fileError && <p className="mt-2 text-sm text-red-600">{fileError}</p>}
-                  {fileSuccess && <p className="mt-2 text-sm text-green-600">{fileSuccess}</p>}
+                    {error && <p className="text-red-500 text-sm">{error}</p>}
+                    {fileError && <p className="text-red-500 text-sm">{fileError}</p>}
+                    {fileSuccess && <p className="text-green-500 text-sm">{fileSuccess}</p>}
+                  </div>
                 </div>
-              </div>
 
-              {phoneNumbers.length > 0 && (
-                <div className="mt-6 pt-4 border-t border-gray-200">
-                  <h3 className="text-sm font-medium text-gray-500">Números Adicionados ({phoneNumbers.length}):</h3>
-                  <ul className="mt-2 flex flex-wrap gap-2">
-                    {phoneNumbers.map(num => (
-                      <li key={num} className="flex items-center bg-gray-100 text-basetone text-sm font-medium pl-3 pr-1.5 py-1 rounded-full border border-gray-300">
-                        {num}
-                        <button onClick={() => handleRemovePhoneNumber(num)} className="ml-2 text-red-500 hover:text-red-700 focus:outline-none focus:ring-1 focus:ring-red-500 rounded-full p-0.5">
-                          <span className="text-xs font-bold">&times;</span>
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+                {phoneNumbers.length > 0 && (
+                  <div className="mt-6 pt-4 border-t border-gray-200">
+                    <h3 className="text-sm font-medium text-gray-500">Números Adicionados ({phoneNumbers.length}):</h3>
+                    <ul className="mt-2 flex flex-wrap gap-2">
+                      {phoneNumbers.map(num => (
+                        <li key={num} className="flex items-center bg-gray-100 text-basetone text-sm font-medium pl-3 pr-1.5 py-1 rounded-full border border-gray-300">
+                          {num}
+                          <button onClick={() => handleRemovePhoneNumber(num)} className="ml-2 text-red-500 hover:text-red-700 focus:outline-none focus:ring-1 focus:ring-red-500 rounded-full p-0.5">
+                            <span className="text-xs font-bold">&times;</span>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
             </section>
 
             <section className="bg-white border border-gray-200 rounded-lg p-6">
@@ -246,6 +248,7 @@ const App: React.FC = () => {
           <img src="https://via.placeholder.com/800x160/333333/FFFFFF?text=PLAN+ADAPT+OVERCOME" alt="Banner de Rodapé" className="w-full h-full object-cover object-center" />
         </div>
       </footer>
+      <Footer />
     </div>
   );
 };
