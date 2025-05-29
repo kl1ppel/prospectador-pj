@@ -42,12 +42,14 @@ export interface RateLimit {
 }
 
 // Define API URL type
-export const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000';
+// Define API URL type
+export type APIConfig = {
+  url: string;
+};
 
-// Define custom JSX namespace for Material-UI components
-declare namespace JSX {
-  interface IntrinsicElements {
-    [elemName: string]: any;
-  }
-}
+export const API_CONFIG: APIConfig = {
+  url: 'http://localhost:3000'
+};
+
+
 

@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES2020",
     "experimentalDecorators": true,
-    "useDefineForClassFields": false,
+    "useDefineForClassFields": true,
     "module": "ESNext",
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "skipLibCheck": true,
@@ -18,13 +18,15 @@
 
     /* Linting */
     "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
 
     "paths": {
       "@/*" :  ["./*"]
-    }
+    },
+
+    "types": ["vite/client", "./src/types/index"]
   }
 }

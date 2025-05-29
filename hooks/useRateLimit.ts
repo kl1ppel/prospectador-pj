@@ -1,12 +1,11 @@
-import { useState, useCallback } from 'react';
-import { RateLimit } from '../types';
+import { useCallback } from 'react';
 
 export const useRateLimit = () => {
-  const [rateLimitState, setRateLimit] = useState<RateLimit>({
+  const rateLimitState = {
     limit: 100,
     remaining: 100,
     reset: Math.floor(Date.now() / 1000) + 3600
-  });
+  } as const;
 
   const checkRateLimit = useCallback(async () => {
     // Here you would typically make an API call to check rate limits

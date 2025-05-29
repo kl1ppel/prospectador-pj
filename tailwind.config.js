@@ -1,16 +1,21 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+    "./*.{js,ts,jsx,tsx}",
+    "./components/**/*.{js,ts,jsx,tsx}"
+  ],
   darkMode: 'class',
-  content: ['./src/**/*.{js,jsx,ts,tsx}', './index.html'],
   theme: {
     extend: {
       colors: {
-        primary: 'rgb(var(--color-primary) / <alpha-value>)',
-        secondary: 'rgb(var(--color-secondary) / <alpha-value>)',
-        accent: 'rgb(var(--color-accent) / <alpha-value>)',
-        neutral: 'rgb(var(--color-neutral) / <alpha-value>)',
-        basetone: 'rgb(var(--color-basetone) / <alpha-value>)',
-        whatsapp: 'rgb(var(--color-whatsapp) / <alpha-value>)',
+        primary: '#1a1a1a',
+        secondary: '#666666',
+        accent: '#cccccc',
+        neutral: '#ffffff',
+        basetone: '#000000',
+        whatsapp: '#25D366',
       }
     }
   },

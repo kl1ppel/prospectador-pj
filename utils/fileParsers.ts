@@ -1,4 +1,4 @@
-import { FileFormat } from '../types';
+
 
 export const readCsvFile = async (file: File): Promise<string[]> => {
   const text = await file.text();
