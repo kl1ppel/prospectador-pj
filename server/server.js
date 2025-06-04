@@ -7,6 +7,7 @@ const authRoutes = require('./routes/authRoutes');
 const messageRoutes = require('./routes/messageRoutes');
 const rdStationRoutes = require('./routes/rdStationRoutes');
 const userRoutes = require('./routes/userRoutes');
+const fileRoutes = require('./routes/fileRoutes');
 
 // Carregar variáveis de ambiente
 dotenv.config();
@@ -24,6 +25,10 @@ app.use('/api/auth', authRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/rdstation', rdStationRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/files', fileRoutes);
+
+// Servir arquivos enviados estaticamente
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Rota de teste
 app.get('/', (req, res) => {

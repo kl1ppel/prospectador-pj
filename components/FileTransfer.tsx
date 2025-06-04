@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../src/contexts/AuthContext';
+import fileService from '../src/services/fileService';
 
 // Interface para mensagens/arquivos
 export interface TransferItem {
@@ -62,46 +63,36 @@ export const FileTransfer: React.FC = () => {
   };
 
   // Iniciar upload de arquivo
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
-    
+
     const file = files[0];
     setIsUploading(true);
     setUploadProgress(0);
-    
-    // Simulando upload com progresso
-    const uploadInterval = setInterval(() => {
-      setUploadProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(uploadInterval);
-          setIsUploading(false);
-          
-          // Adicionar arquivo à lista após "upload" completo
-          const reader = new FileReader();
-          reader.onload = (event) => {
-            const newItem: TransferItem = {
-              id: `file-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-              type: 'file',
-              content: event.target?.result as string,
-              fileName: file.name,
-              fileSize: file.size,
-              fileType: file.type,
-              createdAt: new Date().toISOString(),
-              userId: user?.id || 'anonymous'
-            };
-            
-            setItems(prev => [...prev, newItem]);
-          };
-          reader.readAsDataURL(file);
-          
-          return 0;
-        }
-        return prev + 10;
-      });
-    }, 300);
-    
-    // Limpar input de arquivo
+
+    try {
+      const data = await fileService.upload(file, percent => setUploadProgress(percent));
+
+      const newItem: TransferItem = {
+        id: `file-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        type: 'file',
+        content: data.url,
+        fileName: data.originalName,
+        fileSize: file.size,
+        fileType: file.type,
+        createdAt: new Date().toISOString(),
+        userId: user?.id || 'anonymous'
+      };
+
+      setItems(prev => [...prev, newItem]);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(0);
+    }
+
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -110,9 +101,9 @@ export const FileTransfer: React.FC = () => {
   // Download de arquivo
   const handleDownload = (item: TransferItem) => {
     if (item.type !== 'file' || !item.content) return;
-    
+
     const link = document.createElement('a');
-    link.href = item.content;
+    link.href = item.content.startsWith('http') ? item.content : fileService.downloadUrl(item.content.replace('/uploads/', ''));
     link.download = item.fileName || 'downloaded-file';
     document.body.appendChild(link);
     link.click();
