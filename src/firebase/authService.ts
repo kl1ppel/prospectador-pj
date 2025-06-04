@@ -1,6 +1,7 @@
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signInAnonymously,
   signOut,
   sendPasswordResetEmail,
   confirmPasswordReset,
@@ -63,6 +64,43 @@ export const firebaseAuthService = {
         success: false,
         error: errorMessage
       };
+    }
+  },
+
+  // Login anônimo
+  loginAnonymously: async (): Promise<AuthResponse> => {
+    try {
+      const userCredential: UserCredential = await signInAnonymously(auth);
+      const user = userCredential.user;
+
+      // Criar ou atualizar documento no Firestore
+      await setDoc(doc(db, 'users', user.uid), {
+        name: 'Visitante',
+        email: '',
+        anonymous: true,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
+
+      const userInfo = {
+        id: user.uid,
+        name: 'Visitante',
+        email: '',
+        token: await user.getIdToken()
+      };
+
+      localStorage.setItem('prospect_user', JSON.stringify(userInfo));
+
+      return { success: true, user: userInfo };
+    } catch (error: any) {
+      console.error('Erro no login anônimo:', error);
+      let errorMessage = 'Erro ao entrar como anônimo';
+      if (error.code === 'auth/operation-not-allowed') {
+        errorMessage = 'Login anônimo não está habilitado';
+      } else if (error.code === 'auth/network-request-failed') {
+        errorMessage = 'Erro de conexão. Verifique sua internet';
+      }
+      return { success: false, error: errorMessage };
     }
   },
   

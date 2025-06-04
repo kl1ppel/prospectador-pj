@@ -9,7 +9,7 @@ interface LoginProps {
 export const Login: React.FC<LoginProps> = ({ onToggleForm, onForgotPassword }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { login, error, loading } = useAuth();
+  const { login, loginAnonymously, error, loading } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -89,7 +89,7 @@ export const Login: React.FC<LoginProps> = ({ onToggleForm, onForgotPassword }) 
         </div>
       </form>
 
-      <div className="mt-6 text-center">
+      <div className="mt-6 text-center space-y-2">
         <p className="text-sm text-gray-600">
           Não tem uma conta?{' '}
           <button
@@ -99,6 +99,14 @@ export const Login: React.FC<LoginProps> = ({ onToggleForm, onForgotPassword }) 
             Cadastre-se
           </button>
         </p>
+        <button
+          type="button"
+          disabled={loading}
+          onClick={loginAnonymously}
+          className="text-sm text-gray-500 hover:text-gray-700 focus:outline-none"
+        >
+          Acessar como visitante
+        </button>
       </div>
     </div>
   );

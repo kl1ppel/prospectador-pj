@@ -14,6 +14,7 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<boolean>;
+  loginAnonymously: () => Promise<boolean>;
   register: (name: string, email: string, password: string) => Promise<boolean>;
   logout: () => void;
   resetPassword: (email: string) => Promise<boolean>;
@@ -92,6 +93,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } catch (err: any) {
       console.error('Erro durante o login:', err);
       setError(typeof err === 'string' ? err : (err.message || 'Erro desconhecido ao fazer login'));
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loginAnonymously = async (): Promise<boolean> => {
+    setError(null);
+    try {
+      setLoading(true);
+      const response = await firebaseAuthService.loginAnonymously();
+      if (response.success) {
+        setUser(response.user);
+        return true;
+      } else {
+        setError(response.error || 'Erro ao entrar como anônimo');
+        return false;
+      }
+    } catch (err: any) {
+      console.error('Erro durante login anônimo:', err);
+      setError(typeof err === 'string' ? err : err.message || 'Erro desconhecido ao entrar como anônimo');
       return false;
     } finally {
       setLoading(false);
@@ -242,7 +264,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, resetPassword, updatePassword, error }}>
+    <AuthContext.Provider value={{ user, loading, login, loginAnonymously, register, logout, resetPassword, updatePassword, error }}>
       {children}
     </AuthContext.Provider>
   );
