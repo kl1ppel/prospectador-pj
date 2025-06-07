@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
+import { getStorage } from 'firebase/storage';
 
 // Configuração do Firebase
 // Usando as mesmas credenciais que você já tem para hospedagem
@@ -19,5 +20,6 @@ const app = initializeApp(firebaseConfig);
 // Exportar os serviços do Firebase
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+export const storage = getStorage(app);
 
 export default app;

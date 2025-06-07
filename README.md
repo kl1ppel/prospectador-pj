@@ -11,8 +11,9 @@ A modern web application for managing and processing phone numbers with TypeScri
   - Export phone numbers and messages
 - Message Management
   - Compose and send messages
-  - Track message status
-  - View message history
+- Track message status
+- View message history
+- File Transfer with Firebase Storage
 - User Interface
   - Modern and responsive design
   - Real-time notifications

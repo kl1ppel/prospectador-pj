@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../src/contexts/AuthContext';
+import { firebaseFileTransferService } from '../src/firebase';
 
 // Interface para mensagens/arquivos
 export interface TransferItem {
@@ -30,78 +31,63 @@ export const FileTransfer: React.FC = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Carregar mensagens/arquivos do localStorage ou servidor ao montar o componente
+  // Carregar itens do Firebase quando o componente montar
   useEffect(() => {
-    const savedItems = localStorage.getItem('transferItems');
-    if (savedItems) {
-      setItems(JSON.parse(savedItems));
-    }
-    scrollToBottom();
-  }, []);
-
-  // Salvar mensagens/arquivos no localStorage quando mudar
-  useEffect(() => {
-    localStorage.setItem('transferItems', JSON.stringify(items));
-    scrollToBottom();
-  }, [items]);
+    const loadItems = async () => {
+      if (!user?.id) return;
+      const result = await firebaseFileTransferService.getItems(user.id);
+      if (result.success && result.items) {
+        const formatted = result.items.map(it => ({
+          ...it,
+          createdAt: it.createdAt.toISOString()
+        }));
+        setItems(formatted);
+      }
+      scrollToBottom();
+    };
+    loadItems();
+  }, [user]);
 
   // Enviar texto
-  const handleSendText = () => {
-    if (!textContent.trim()) return;
-    
-    const newItem: TransferItem = {
-      id: `text-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      type: 'text',
-      content: textContent,
-      createdAt: new Date().toISOString(),
-      userId: user?.id || 'anonymous'
-    };
-    
-    setItems(prev => [...prev, newItem]);
-    setTextContent('');
+  const handleSendText = async () => {
+    if (!textContent.trim() || !user?.id) return;
+
+    const result = await firebaseFileTransferService.addText(user.id, textContent);
+    if (result.success && result.item) {
+      const newItem = {
+        ...result.item,
+        createdAt: result.item.createdAt.toISOString()
+      } as TransferItem;
+      setItems(prev => [...prev, newItem]);
+      setTextContent('');
+    }
   };
 
   // Iniciar upload de arquivo
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (!files || files.length === 0) return;
-    
+    if (!files || files.length === 0 || !user?.id) return;
+
     const file = files[0];
     setIsUploading(true);
     setUploadProgress(0);
-    
-    // Simulando upload com progresso
-    const uploadInterval = setInterval(() => {
-      setUploadProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(uploadInterval);
-          setIsUploading(false);
-          
-          // Adicionar arquivo à lista após "upload" completo
-          const reader = new FileReader();
-          reader.onload = (event) => {
-            const newItem: TransferItem = {
-              id: `file-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-              type: 'file',
-              content: event.target?.result as string,
-              fileName: file.name,
-              fileSize: file.size,
-              fileType: file.type,
-              createdAt: new Date().toISOString(),
-              userId: user?.id || 'anonymous'
-            };
-            
-            setItems(prev => [...prev, newItem]);
-          };
-          reader.readAsDataURL(file);
-          
-          return 0;
-        }
-        return prev + 10;
-      });
-    }, 300);
-    
-    // Limpar input de arquivo
+
+    const result = await firebaseFileTransferService.addFile(
+      user.id,
+      file,
+      (p) => setUploadProgress(p)
+    );
+
+    setIsUploading(false);
+
+    if (result.success && result.item) {
+      const newItem = {
+        ...result.item,
+        createdAt: result.item.createdAt.toISOString()
+      } as TransferItem;
+      setItems(prev => [...prev, newItem]);
+    }
+
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -136,8 +122,11 @@ export const FileTransfer: React.FC = () => {
   };
 
   // Função para excluir um item
-  const handleDeleteItem = (id: string) => {
-    setItems(prev => prev.filter(item => item.id !== id));
+  const handleDeleteItem = async (id: string) => {
+    const result = await firebaseFileTransferService.deleteItem(id);
+    if (result.success) {
+      setItems(prev => prev.filter(item => item.id !== id));
+    }
   };
 
   // Filtrar itens com base no tipo selecionado
