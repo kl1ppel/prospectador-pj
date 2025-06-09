@@ -1,3 +1,4 @@
+
 import { Link } from 'react-router-dom';
 
 export const Navigation = () => {
@@ -26,7 +27,7 @@ export const Navigation = () => {
             </Link>
             <Link 
               to="/prospectai" 
-              className="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
+              className="inline-flex items-center px-1 pt-1 border-b-2 border-blue-500 text-sm font-medium text-gray-900 dark:text-white"
             >
               ProspectAI
             </Link>

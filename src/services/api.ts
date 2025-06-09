@@ -307,48 +307,6 @@ export const messageService = {
   }
 };
 
-// Serviço do RD Station
-export const rdStationService = {
-  // Salvar configuração
-  saveConfig: async (apiToken: string, settings?: any) => {
-    try {
-      const response = await api.post('/rdstation/config', { apiToken, settings });
-      return response.data;
-    } catch (error: any) {
-      throw error.response?.data?.error || 'Erro ao salvar configuração';
-    }
-  },
 
-  // Obter configuração
-  getConfig: async () => {
-    try {
-      const response = await api.get('/rdstation/config');
-      return response.data;
-    } catch (error: any) {
-      if (error.response?.status === 404) {
-        return { success: false, config: null };
-      }
-      throw error.response?.data?.error || 'Erro ao obter configuração';
-    }
-  },
-
-  // Enviar contato para o RD Station
-  sendContact: async (data: {
-    name: string;
-    email: string;
-    phone?: string;
-    companyName?: string;
-    website?: string;
-    jobTitle?: string;
-    customFields?: any;
-  }) => {
-    try {
-      const response = await api.post('/rdstation/contact', data);
-      return response.data;
-    } catch (error: any) {
-      throw error.response?.data?.error || 'Erro ao enviar contato';
-    }
-  }
-};
 
 export default api;

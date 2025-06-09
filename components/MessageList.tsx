@@ -1,32 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { WhatsAppIcon } from './icons';
 import { ContactForm } from './ContactForm';
-import { sendContactToRDStation } from '../utils/rdStationAPI';
 
 import { MessageHistoryItem } from './MessageHistory';
 
 interface MessageListProps {
   phoneNumbers: string[];
   baseMessage: string;
-  rdStationEnabled?: boolean;
   onMessageSent?: (historyItem: MessageHistoryItem) => void;
 }
 
 const MessageCard: React.FC<{ 
   phoneNumber: string; 
   baseMessage: string; 
-  rdStationEnabled?: boolean;
   onMessageSent?: (historyItem: MessageHistoryItem) => void;
 }> = ({ 
   phoneNumber, 
   baseMessage, 
-  rdStationEnabled,
   onMessageSent 
 }) => {
   const [showContactForm, setShowContactForm] = useState<boolean>(false);
-  const [sendingToRD, setSendingToRD] = useState<boolean>(false);
-  const [rdSuccess, setRdSuccess] = useState<boolean>(false);
-  const [rdError, setRdError] = useState<string | null>(null);
 
   const handleSendViaWhatsApp = () => {
     if (!baseMessage.trim()) {
@@ -57,39 +50,8 @@ const MessageCard: React.FC<{
     }
   };
   
-  const handleSendToRDStation = () => {
-    setShowContactForm(true);
-  };
-  
   const handleContactFormSubmit = async (contactData: any) => {
-    setSendingToRD(true);
-    setRdError(null);
-    
-    try {
-      await sendContactToRDStation(contactData);
-      setRdSuccess(true);
-      setShowContactForm(false);
-      setTimeout(() => setRdSuccess(false), 5000); // Reset success message after 5 seconds
-      
-      // Registrar no histórico
-      if (onMessageSent) {
-        onMessageSent({
-          id: `rdstation-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-          phoneNumber,
-          message: contactData.notes || 'Contato enviado para RD Station',
-          sentAt: new Date().toISOString(),
-          type: 'rdstation',
-          status: 'sent',
-          contactName: contactData.name || '',
-          contactEmail: contactData.email || '',
-          userId: 'current-user'
-        });
-      }
-    } catch (error) {
-      setRdError(error instanceof Error ? error.message : 'Erro ao enviar para RD Station');
-    } finally {
-      setSendingToRD(false);
-    }
+    setShowContactForm(false);
   };
   
   const handleContactFormCancel = () => {
@@ -109,33 +71,8 @@ const MessageCard: React.FC<{
           >
             <WhatsAppIcon className="w-5 h-5 mr-2" /> WhatsApp
           </button>
-          
-          {rdStationEnabled && (
-            <button
-              onClick={handleSendToRDStation}
-              className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-blue-500"
-              aria-label={`Enviar contato para RD Station CRM`}
-            >
-              <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 3a7 7 0 100 14 7 7 0 000-14zm-9 7a9 9 0 1118 0 9 9 0 01-18 0zm10.293-4.707a1 1 0 011.414 0l2 2a1 1 0 010 1.414l-2 2a1 1 0 01-1.414-1.414L12.586 10l-1.293-1.293a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
-              RD Station
-            </button>
-          )}
         </div>
       </div>
-      
-      {rdSuccess && (
-        <div className="mt-2 text-sm text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 p-2 rounded-lg">
-          ✓ Contato enviado com sucesso para o RD Station CRM
-        </div>
-      )}
-      
-      {rdError && (
-        <div className="mt-2 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 p-2 rounded-lg">
-          ✗ {rdError}
-        </div>
-      )}
       
       {showContactForm && (
         <ContactForm 
@@ -148,7 +85,7 @@ const MessageCard: React.FC<{
   );
 };
 
-export const MessageList: React.FC<MessageListProps> = ({ phoneNumbers, baseMessage, rdStationEnabled, onMessageSent }) => {
+export const MessageList: React.FC<MessageListProps> = ({ phoneNumbers, baseMessage, onMessageSent }) => {
   const [isSendingAll, setIsSendingAll] = useState<boolean>(false);
   const [processedCount, setProcessedCount] = useState<number>(0);
   const [totalToProcess, setTotalToProcess] = useState<number>(0);
@@ -377,7 +314,6 @@ Deseja continuar?`;
           key={number} 
           phoneNumber={number} 
           baseMessage={baseMessage} 
-          rdStationEnabled={rdStationEnabled}
           onMessageSent={onMessageSent} 
         />
       ))}
