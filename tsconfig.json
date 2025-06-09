@@ -27,6 +27,6 @@
       "@/*" :  ["./*"]
     },
 
-    "types": ["vite/client", "./src/types/index"]
+    "types": ["vite/client", "./src/types/index", "vitest/globals"]
   }
 }

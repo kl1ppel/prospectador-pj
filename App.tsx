@@ -13,7 +13,8 @@ import { AuthProvider, useAuth } from './src/contexts/AuthContext';
 import { AuthScreen } from './components/AuthScreen';
 import { ResetPasswordPage } from './components/ResetPasswordPage';
 import { Footer } from './components/Footer';
-import { FileTransfer } from './components/FileTransfer';
+import FileTransfer from './components/FileTransfer';
+
 import { authService } from './src/services/api';
 // Logo será carregado da pasta pública
 

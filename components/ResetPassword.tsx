@@ -29,7 +29,7 @@ export const ResetPassword: React.FC<ResetPasswordProps> = ({ token, onBack, onS
       return;
     }
     
-    const success = await updatePassword(token, password);
+    const success = await updatePassword(password);
     if (success) {
       onSuccess();
     }

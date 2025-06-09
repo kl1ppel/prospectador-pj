@@ -22,7 +22,7 @@ export const Register: React.FC<RegisterProps> = ({ onToggleForm }) => {
     }
     
     setPasswordError(null);
-    await register(name, email, password);
+    await register(email, password);
   };
 
   return (

@@ -3,21 +3,23 @@ import { authService } from '../services/api';
 import { firebaseAuthService } from '../firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../firebase/config';
+import { User as FirebaseUser } from 'firebase/auth';
 
 interface User {
+  uid: string;
   id: string;
-  name: string;
   email: string;
+  emailVerified: boolean;
 }
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
-  register: (name: string, email: string, password: string) => Promise<boolean>;
-  logout: () => void;
-  resetPassword: (email: string) => Promise<boolean>;
-  updatePassword: (token: string, newPassword: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<void>;
+  register: (name: string, email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
+  updatePassword: (newPassword: string) => Promise<void>;
   error: string | null;
 }
 
@@ -52,10 +54,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             setUser(userData);
           } else {
             // Caso não encontre no localStorage, criar dados básicos
-            const basicUserData = {
+            const basicUserData: User = {
+              uid: firebaseUser.uid,
               id: firebaseUser.uid,
-              name: firebaseUser.displayName || '',
-              email: firebaseUser.email || ''
+              email: firebaseUser.email || '',
+              emailVerified: firebaseUser.emailVerified
             };
             setUser(basicUserData);
           }
@@ -73,7 +76,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return () => unsubscribe();
   }, []);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (email: string, password: string): Promise<void> => {
     setError(null);
     
     try {
@@ -84,35 +87,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       if (response.success) {
         setUser(response.user);
-        return true;
       } else {
         setError(response.error || 'Erro ao fazer login');
-        return false;
       }
     } catch (err: any) {
       console.error('Erro durante o login:', err);
       setError(typeof err === 'string' ? err : (err.message || 'Erro desconhecido ao fazer login'));
-      return false;
     } finally {
       setLoading(false);
     }
   };
 
-  const register = async (name: string, email: string, password: string): Promise<boolean> => {
+  const register = async (name: string, email: string, password: string): Promise<void> => {
     setError(null);
     
     try {
       setLoading(true);
       
       // Usar o serviço de autenticação do Firebase
-      const response = await firebaseAuthService.register(name, email, password);
+      const response = await firebaseAuthService.register(email, password);
       
       if (response.success) {
         setUser(response.user);
-        return true;
       } else {
         setError(response.error || 'Erro ao registrar usuário');
-        return false;
       }
     } catch (err: any) {
       console.error('Erro durante o registro:', err);
@@ -138,14 +136,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         
         setError(errorMessage);
       }
-      
-      return false;
     } finally {
       setLoading(false);
     }
   };
 
-  const logout = async () => {
+  const logout = async (): Promise<void> => {
     try {
       // Usar o serviço de autenticação do Firebase
       await firebaseAuthService.logout();
@@ -156,7 +152,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   // Função para solicitar redefinição de senha
-  const resetPassword = async (email: string): Promise<boolean> => {
+  const resetPassword = async (email: string): Promise<void> => {
     setError(null);
     
     try {
@@ -166,10 +162,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await firebaseAuthService.forgotPassword(email);
       
       if (response.success) {
-        return true;
       } else {
         setError(response.error || 'Erro ao solicitar redefinição de senha');
-        return false;
       }
     } catch (err: any) {
       console.error('Erro ao solicitar redefinição de senha:', err);
@@ -190,28 +184,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         
         setError(errorMessage);
       }
-      
-      return false;
     } finally {
       setLoading(false);
     }
   };
   
   // Função para atualizar a senha usando um token
-  const updatePassword = async (token: string, newPassword: string): Promise<boolean> => {
+  const updatePassword = async (newPassword: string): Promise<void> => {
     setError(null);
     
     try {
       setLoading(true);
       
       // Usar o serviço de autenticação do Firebase
-      const response = await firebaseAuthService.resetPassword(token, newPassword);
+      const response = await firebaseAuthService.resetPassword(newPassword);
       
       if (response.success) {
-        return true;
       } else {
         setError(response.error || 'Erro ao redefinir senha');
-        return false;
       }
     } catch (err: any) {
       console.error('Erro ao redefinir senha:', err);
@@ -234,8 +224,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         
         setError(errorMessage);
       }
-      
-      return false;
     } finally {
       setLoading(false);
     }

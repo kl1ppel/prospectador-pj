@@ -35,12 +35,21 @@ export const UserMenu: React.FC<UserMenuProps> = ({ isDarkMode, toggleTheme }) =
 
   // Extrair iniciais do nome do usuário
   const getInitials = () => {
-    if (!user?.name) return '?';
+    const userName = user?.email?.split('@')[0] || '?';
     
-    const names = user.name.split(' ');
-    if (names.length === 1) return names[0].charAt(0).toUpperCase();
+    if (userName === '?') return '?';
     
-    return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
+    // Se for apenas uma letra, retorne-a maiúscula
+    if (userName.length === 1) return userName.toUpperCase();
+    
+    // Se tiver espaços, pegar a inicial de cada palavra
+    if (userName.includes(' ')) {
+      const names = userName.split(' ');
+      return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
+    }
+    
+    // Senão, retornar a primeira letra
+    return userName.charAt(0).toUpperCase();
   };
 
   return (
@@ -57,7 +66,9 @@ export const UserMenu: React.FC<UserMenuProps> = ({ isDarkMode, toggleTheme }) =
       {isOpen && (
         <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-50">
           <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-            <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{user?.name}</p>
+            <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+              {user?.email?.split('@')[0] || 'Usuário'}
+            </p>
             <p className="text-sm text-gray-500 dark:text-gray-300 truncate">{user?.email}</p>
           </div>
           
